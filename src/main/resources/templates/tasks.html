@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>My Tasks</title>
+    <style>
+        body {
+            background-color: #3b3a36; /* dark sepia grey */
+            color: #f5f5dc; /* light beige text for contrast */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+        }
+        h1 {
+            color: #f5deb3; /* wheat */
+        }
+        .task {
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #4b4a47;
+            border-radius: 5px;
+        }
+        .box-input {
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #7B4D00;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+<h1>Focus Gureum Tasks</h1>
+<div>
+    <form th:action="@{/tasks}" method="post">
+        <div class="box-input">
+            <input type="text" name="name" placeholder="Task name..." required>
+        </div>
+        <div class="box-input">
+            <label>
+                Is it active?:
+                <input type="checkbox" name="status">
+            </label>
+        </div>
+        <div class="box-input">
+            <input type="text" name="category_id" placeholder="category id..." required>
+        </div>
+        <div class="box-input">
+            <button type="submit">Add Task</button>
+        </div>
+    </form>
+
+    <th:block th:each="task : ${tasks}">
+        <div class="task">
+            <span th:text="${task.id} + ' named: ' + ${task.name} + ' falls into category ' + ${task.category.id}">Task title</span>
+        </div>
+    </th:block>
+</div>
+</body>
+</html>

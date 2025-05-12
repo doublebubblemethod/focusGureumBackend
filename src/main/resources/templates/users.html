@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Focus Gureum Users</title>
+  <style>
+    body {
+      background-color: #3b3a36; /* dark sepia grey */
+      color: #f5f5dc; /* light beige text for contrast */
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      padding: 20px;
+    }
+    h1 {
+      color: #f5deb3; /* wheat */
+    }
+    .user {
+      margin: 10px 0;
+      padding: 10px;
+      background-color: #4b4a47;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+<div>
+  <th:block th:each="user : ${users}">
+    <div class="user">
+      <span th:text="${user.nickname}">user</span>
+    </div>
+  </th:block>
+</div>
+</body>
+</html>

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Focus Gureum</title>
+    <style>
+        body {
+            background-color: #3b3a36; /* dark sepia grey */
+            color: #f5f5dc; /* light beige text for contrast */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+        }
+        h1 {
+            color: #f5deb3; /* wheat */
+        }
+        .event {
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #4b4a47;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+<h1>My Event Information</h1>
+<div>
+    <th:block th:each="event : ${events}">
+        <div class="event">
+            <span th:text="${event.user.id} + ' - ' + ${event.name}">Event title</span>
+        </div>
+    </th:block>
+</div>
+</body>
+</html>
