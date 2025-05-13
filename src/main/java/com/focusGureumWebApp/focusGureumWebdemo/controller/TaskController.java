@@ -2,13 +2,15 @@ package com.focusGureumWebApp.focusGureumWebdemo.controller;
 
 import com.focusGureumWebApp.focusGureumWebdemo.models.Task;
 import com.focusGureumWebApp.focusGureumWebdemo.services.TaskService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Controller
+@RestController
 @RequestMapping("/tasks")
 public class TaskController {
     private final TaskService taskService;
@@ -17,25 +19,36 @@ public class TaskController {
         this.taskService = taskService;
     }
     @GetMapping
-    public String getTaskService(Model model) {
-        List<Task> tasks = taskService.getAllTasks();
-        model.addAttribute("tasks", tasks);
-        return "tasks";
+    public ResponseEntity<?> getAllTasks() {
+        try {
+            List<Task> tasks = taskService.getAllTasks();
+            return ResponseEntity.ok(tasks); // 200 OK with the list
+        } catch (Exception e) {
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error retrieving tasks: " + e.getMessage());
+        }
     }
-    @PostMapping
-    public String createTask(@RequestParam String name, @RequestParam boolean status, @RequestParam Integer category_id) {
-        taskService.createTask(name, status, category_id);
-        return "redirect:/tasks";
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteTask(@PathVariable Integer id) {
+        try {
+            taskService.deleteTask(id);
+            return ResponseEntity.ok("Task deleted successfully");
+        } catch (Exception e) {
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error deleting task: " + e.getMessage());
+        }
     }
-    @GetMapping("/{id}/delete")
-    public String deleteTask(@PathVariable Integer id) {
-        taskService.deleteTask(id);
-        return "redirect:/tasks";
-    }
-
-    @GetMapping("/{id}/toggle")
-    public String toggleTask(@PathVariable Integer id) {
-        taskService.toggleTask(id);
-        return "redirect:/tasks";
+    @PatchMapping("/{id}/toggle")
+    public ResponseEntity<?> toggleTask(@PathVariable Integer id) {
+        try {
+            taskService.toggleTask(id);
+            return ResponseEntity.ok("Task status toggled successfully");
+        } catch (Exception e) {
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error toggling task status: " + e.getMessage());
+        }
     }
 }
