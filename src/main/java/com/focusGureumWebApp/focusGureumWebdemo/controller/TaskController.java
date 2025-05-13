@@ -9,6 +9,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/tasks")
@@ -49,6 +50,24 @@ public class TaskController {
             return ResponseEntity
                     .status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Error toggling task status: " + e.getMessage());
+        }
+    }
+
+    @PatchMapping("/{id}/name")
+    public ResponseEntity<?> updateTaskName(@PathVariable Integer id,
+                                            @RequestBody Map<String, String> body) {
+        try {
+            String newName = body.get("name");
+            if (newName == null || newName.trim().isEmpty()) {
+                return ResponseEntity.badRequest().body("Task name cannot be empty");
+            }
+
+            taskService.updateTaskName(id, newName);
+            return ResponseEntity.ok("Task name updated successfully");
+        } catch (Exception e) {
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error updating task name: " + e.getMessage());
         }
     }
 }

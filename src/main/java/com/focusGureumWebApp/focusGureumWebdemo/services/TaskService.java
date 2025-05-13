@@ -42,4 +42,10 @@ public class TaskService {
         task.setStatus(!task.isStatus());
         taskRepository.save(task);
     }
+
+    public void updateTaskName(Integer id, String newName) {
+        Task task = taskRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Task not found"));
+        task.setName(newName);
+        taskRepository.save(task);
+    }
 }
