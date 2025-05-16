@@ -19,14 +19,46 @@
       background-color: #4b4a47;
       border-radius: 5px;
     }
+    .box-input {
+      margin: 10px 0;
+      padding: 10px;
+      background-color: #7B4D00;
+      border-radius: 5px;
+    }
   </style>
 </head>
 <body>
 <h1>My Categories Information</h1>
 <div>
+  <form th:action="@{/categories}" method="post">
+    <div class="box-input">
+      <label>
+        <input type="text" name="name" placeholder="Category name..." required>
+      </label>
+    </div>
+    <div class="box-input">
+      <label>
+        Is it active?:
+        <input type="checkbox" name="status">
+      </label>
+    </div>
+    <div class="box-input">
+      <label>
+        <input type="text" name="userId" placeholder="User Id..." required>
+      </label>
+    </div>
+    <div class="box-input">
+      <label>
+        <input type="text" name="imagePath" placeholder="image url..." required>
+      </label>
+    </div>
+    <div class="box-input">
+      <button type="submit">Add Category</button>
+    </div>
+  </form>
   <th:block th:each="category : ${categories}">
     <div class="category">
-      <span th:text="${category.user.id} + ' - ' + ${category.name}">category title</span>
+      <span th:text="${category.user.id} + ' named ' + ${category.name}">category title</span>
     </div>
   </th:block>
 </div>
