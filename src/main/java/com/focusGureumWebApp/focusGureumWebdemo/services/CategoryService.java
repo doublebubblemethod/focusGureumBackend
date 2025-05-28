@@ -36,10 +36,24 @@ public class CategoryService {
         categoryRepository.deleteById(id);
     }
 
-    public void toggleCategory(Integer id) {
-        Category category = categoryRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Category not found"));
-        category.setStatus(!category.isStatus());
-        categoryRepository.save(category);
+    public boolean toggleCategory(Integer id) {
+        try {
+            // Attempt to find the category by ID
+            Category category = categoryRepository.findById(id)
+                    .orElseThrow(() -> new IllegalArgumentException("Category not found"));
+
+            // Toggle the category's status
+            category.setStatus(!category.isStatus());
+
+            // Save the updated category
+            categoryRepository.save(category);
+
+            // Return true if the operation was successful
+            return true;
+        } catch (Exception e) {
+            // Return false if any error occurs (like category not found, or DB issues)
+            return false;
+        }
     }
 
     public List<Category> getAll() {

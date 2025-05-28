@@ -3,8 +3,9 @@ package com.focusGureumWebApp.focusGureumWebdemo.repository;
 import com.focusGureumWebApp.focusGureumWebdemo.models.HabitSchedule;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
+import java.util.Optional;
+
 
 public interface HabitScheduleRepository extends JpaRepository<HabitSchedule, Integer> {
-    List<HabitSchedule> findAllByHabit_Id(Integer habitId);
+    Optional<HabitSchedule> findByHabit_Id(Integer habitId);
 }

@@ -19,6 +19,4 @@ public class HabitSchedule {
     @ManyToOne
     @JoinColumn(name = "habit_id", nullable = false)
     private Habit habit;
-
-    // Getters, setters, constructors
 }
