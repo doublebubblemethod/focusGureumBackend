@@ -36,7 +36,9 @@ public class TaskService {
     public void deleteTask(Integer id) {
         taskRepository.deleteById(id);
     }
-
+    public void deleteTasksByCategoryId(Integer CategoryId) {
+        taskRepository.deleteByCategory_Id(CategoryId);
+    }
     public void toggleTask(Integer id) {
         Task task = taskRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Task not found"));
         task.setStatus(!task.isStatus());

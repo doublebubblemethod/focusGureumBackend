@@ -1,5 +1,6 @@
 package com.focusGureumWebApp.focusGureumWebdemo.controller;
 
+import com.focusGureumWebApp.focusGureumWebdemo.dto.TaskRequest;
 import com.focusGureumWebApp.focusGureumWebdemo.models.Task;
 import com.focusGureumWebApp.focusGureumWebdemo.services.TaskService;
 import org.springframework.http.HttpStatus;
@@ -17,6 +18,7 @@ public class TaskController {
     public TaskController(TaskService taskService) {
         this.taskService = taskService;
     }
+
     @GetMapping
     public ResponseEntity<?> getAllTasks() {
         try {
@@ -26,6 +28,15 @@ public class TaskController {
             return ResponseEntity
                     .status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Error retrieving tasks: " + e.getMessage());
+        }
+    }
+    @PatchMapping("/create")
+    public ResponseEntity<String> createTaskWithPatch(@RequestBody TaskRequest request) {
+        try {
+            taskService.createTask(request.getName(), request.isStatus(), request.getCategoryId());
+            return ResponseEntity.ok("Task created successfully");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
     @DeleteMapping("/{id}")
@@ -68,4 +79,5 @@ public class TaskController {
                     .body("Error updating task name: " + e.getMessage());
         }
     }
+
 }
