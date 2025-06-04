@@ -23,5 +23,4 @@ public class Habit {
     @JoinColumn(name = "user_id", nullable = false)
     private AppUser user;
 
-    // Getters, setters, constructors
 }
