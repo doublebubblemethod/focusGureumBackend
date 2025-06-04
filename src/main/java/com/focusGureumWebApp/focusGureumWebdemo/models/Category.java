@@ -1,6 +1,9 @@
 package com.focusGureumWebApp.focusGureumWebdemo.models;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
+
+import java.util.List;
 
 @Entity
 @Data
@@ -22,6 +25,8 @@ public class Category {
     @JoinColumn(name = "user_id", nullable = false)
     private AppUser user;
 
-    // Getters, setters, constructors
+    @OneToMany(mappedBy = "category", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @JsonIgnore
+    private List<Task> tasks;
 }
 

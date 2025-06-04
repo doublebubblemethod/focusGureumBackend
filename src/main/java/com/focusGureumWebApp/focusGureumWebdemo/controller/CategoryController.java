@@ -1,5 +1,6 @@
 package com.focusGureumWebApp.focusGureumWebdemo.controller;
 
+import com.focusGureumWebApp.focusGureumWebdemo.dto.CategoryRequest;
 import com.focusGureumWebApp.focusGureumWebdemo.models.Category;
 import com.focusGureumWebApp.focusGureumWebdemo.models.Task;
 import com.focusGureumWebApp.focusGureumWebdemo.services.CategoryService;
@@ -13,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 @Controller
-@RequestMapping("/categories")
+@RequestMapping("api/categories")
 public class CategoryController {
     private final CategoryService categoryService;
     public CategoryController(CategoryService categoryService) {
@@ -30,13 +31,13 @@ public class CategoryController {
                     .body("Error retrieving categories: " + e.getMessage());
         }
     }
-    @PatchMapping("/{id}/name")
-    public ResponseEntity<?> createCategory(@RequestBody Map<String, Object> body) {
+    @PatchMapping("/create")
+    public ResponseEntity<?> createCategory(@RequestBody CategoryRequest body) {
         try {
-            String name = (String) body.get("name");
-            Boolean status = (Boolean) body.get("status");
-            String imagePath = (String) body.get("imagePath");
-            Integer userId = (Integer) body.get("userId");
+            String name = (String) body.getName();
+            Boolean status = (Boolean) body.isStatus();
+            String imagePath = (String) body.getImagePath();
+            Integer userId = (Integer) body.getUserId();
 
             // Basic validation
             if (name == null || name.trim().isEmpty()) {
@@ -81,7 +82,28 @@ public class CategoryController {
                     .body("Error toggling category: " + e.getMessage());
         }
     }
+    @PatchMapping("/{id}/rename")
+    public ResponseEntity<?> renameCategory(@PathVariable Integer id, @RequestBody Map<String, String> body) {
+        try {
+            String name = body.get("name");
+            if (name == null || name.trim().isEmpty()) {
+                return ResponseEntity.badRequest().body("New category name cannot be empty");
+            }
 
+            boolean renamed = categoryService.renameCategory(id, name);
+
+            if (renamed) {
+                return ResponseEntity.ok("Category renamed successfully");
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body("Category could not be renamed");
+            }
+        } catch (Exception e) {
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error renaming category: " + e.getMessage());
+        }
+    }
     @GetMapping("/user/{userId}")
     public String getCategoryService(@PathVariable Integer userId, Model model) {
         List<Category> categories = categoryService.getAllByUser_Id(userId);

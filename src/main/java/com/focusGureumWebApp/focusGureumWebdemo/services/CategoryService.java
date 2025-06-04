@@ -7,6 +7,7 @@ import com.focusGureumWebApp.focusGureumWebdemo.repository.CategoryRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CategoryService {
@@ -59,4 +60,15 @@ public class CategoryService {
     public List<Category> getAll() {
         return categoryRepository.findAll();
     }
+    public boolean renameCategory(Integer id, String newName) {
+        Optional<Category> optionalCategory = categoryRepository.findById(id);
+        if (optionalCategory.isEmpty()) {
+            return false; // Category not found
+        }
+        Category category = optionalCategory.get();
+        category.setName(newName);
+        categoryRepository.save(category);
+        return true;
+    }
+
 }
