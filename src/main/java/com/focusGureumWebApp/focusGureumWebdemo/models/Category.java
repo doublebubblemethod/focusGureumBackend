@@ -15,9 +15,6 @@ public class Category {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
-    private boolean status;
-
     @Column(name = "image_path")
     private String imagePath;
 

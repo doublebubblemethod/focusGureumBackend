@@ -1,14 +1,14 @@
 package com.focusGureumWebApp.focusGureumWebdemo.services;
 
+import com.focusGureumWebApp.focusGureumWebdemo.dto.CategoryRequest;
 import com.focusGureumWebApp.focusGureumWebdemo.models.AppUser;
 import com.focusGureumWebApp.focusGureumWebdemo.models.Category;
 import com.focusGureumWebApp.focusGureumWebdemo.repository.AppUserRepository;
 import com.focusGureumWebApp.focusGureumWebdemo.repository.CategoryRepository;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
-
 @Service
 public class CategoryService {
     private final CategoryRepository categoryRepository;
@@ -18,57 +18,57 @@ public class CategoryService {
         this.categoryRepository = categoryRepository;
         this.appUserRepository = appUserRepository;
     }
+    /*
+    function that finds a category and checks if the user is authorized
+     */
+    public Category getCategoryForUser(Integer categoryId, String nickname) {
+        Category category = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new RuntimeException("Category not found"));
 
-    public List<Category> getAllByUser_Id(Integer userId) {
-        return categoryRepository.findAllByUser_Id(userId);
+        if (!category.getUser().getNickname().equals(nickname)) {
+            throw new AccessDeniedException("User not authorized to access this category");
+        }
+        return category;
     }
-    public void createCategory(String name, boolean status, String imagePath, Integer userId) {
-        AppUser user = appUserRepository.findById(userId)
+
+    public List<Category> findAllByUserNickname(String nickname) {
+        return categoryRepository.findByUserNickname(nickname);
+    }
+    public Category createCategory(CategoryRequest categoryRequest, String nickname) {
+        AppUser user = appUserRepository.findByNickname(nickname)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
         Category category = new Category();
-        category.setName(name);
-        category.setStatus(status);
-        category.setImagePath(imagePath);
+        category.setName(categoryRequest.getName());
+        category.setImagePath(categoryRequest.getImagePath());
         category.setUser(user);
         categoryRepository.save(category);
+        return category;
     }
 
-    public void deleteCategory(Integer id) {
-        categoryRepository.deleteById(id);
+    public void deleteCategory(Category category) {
+        categoryRepository.delete(category);
     }
 
-    public boolean toggleCategory(Integer id) {
+    public boolean renameCategory(Category category, String newName) {
         try {
-            // Attempt to find the category by ID
-            Category category = categoryRepository.findById(id)
-                    .orElseThrow(() -> new IllegalArgumentException("Category not found"));
-
-            // Toggle the category's status
-            category.setStatus(!category.isStatus());
-
-            // Save the updated category
+            category.setName(newName);
             categoryRepository.save(category);
-
-            // Return true if the operation was successful
             return true;
         } catch (Exception e) {
-            // Return false if any error occurs (like category not found, or DB issues)
+            // Log error if needed
             return false;
         }
     }
 
-    public List<Category> getAll() {
-        return categoryRepository.findAll();
-    }
-    public boolean renameCategory(Integer id, String newName) {
-        Optional<Category> optionalCategory = categoryRepository.findById(id);
-        if (optionalCategory.isEmpty()) {
-            return false; // Category not found
+    public boolean changeImage(Category category, String imageUrl) {
+        try {
+            category.setImagePath(imageUrl);
+            categoryRepository.save(category);
+            return true;
+        } catch (Exception e) {
+            // Log error if needed
+            return false;
         }
-        Category category = optionalCategory.get();
-        category.setName(newName);
-        categoryRepository.save(category);
-        return true;
     }
 
 }

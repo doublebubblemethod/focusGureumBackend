@@ -9,7 +9,6 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class CategoryRequest {
     private String name;
-    private boolean status;
     private String imagePath;
     private Integer userId;
 }
