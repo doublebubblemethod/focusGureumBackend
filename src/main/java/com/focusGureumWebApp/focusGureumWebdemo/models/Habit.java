@@ -3,6 +3,8 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
+
 @Entity
 @Data
 public class Habit {
@@ -23,4 +25,9 @@ public class Habit {
     @JoinColumn(name = "user_id", nullable = false)
     private AppUser user;
 
+    @OneToMany(mappedBy = "habit", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<HabitLog> logs;
+
+    @OneToMany(mappedBy = "habit", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<HabitSchedule> schedules;
 }

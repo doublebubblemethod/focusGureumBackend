@@ -29,7 +29,6 @@ public class AppUserService implements UserDetailsService {
 
     public String addUser(AppUser appUser) {
         // Encode password before saving the user
-
         appUser.setPassword(passwordEncoder.encode(appUser.getPassword()));
         repository.save(appUser);
         return "User Added Successfully";
