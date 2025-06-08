@@ -1,19 +1,24 @@
 package com.focusGureumWebApp.focusGureumWebdemo.services;
+import com.focusGureumWebApp.focusGureumWebdemo.dto.HabitRequest;
+import com.focusGureumWebApp.focusGureumWebdemo.models.AppUser;
 import com.focusGureumWebApp.focusGureumWebdemo.models.Habit;
-import com.focusGureumWebApp.focusGureumWebdemo.models.Task;
+import com.focusGureumWebApp.focusGureumWebdemo.repository.AppUserRepository;
 import com.focusGureumWebApp.focusGureumWebdemo.repository.HabitRepository;
 import com.focusGureumWebApp.focusGureumWebdemo.repository.HabitScheduleRepository;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 public class HabitService {
     private final HabitRepository habitRepository;
-    public HabitService(HabitRepository habitRepository) {
+    private final AppUserRepository appUserRepository;
+    public HabitService(HabitRepository habitRepository, AppUserRepository appUserRepository) {
         this.habitRepository = habitRepository;
+        this.appUserRepository = appUserRepository;
     }
     /*
     function that finds a habit and checks if the user is authorised
@@ -33,10 +38,6 @@ public class HabitService {
         return habitRepository.findByUserNickname(nickname);
     }
 
-    public Habit getById(Integer id) {
-        return habitRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Habit not found"));
-    }
     public void deleteHabit(Habit habit) {
         //jpa must delete related habit schedule and logs
         //@OneToMany(mappedBy = "habit", cascade = CascadeType.REMOVE, orphanRemoval = true)
@@ -50,4 +51,19 @@ public class HabitService {
         habit.setActive(!habit.isActive());
         habitRepository.save(habit);
     }
+    public Habit createHabit(HabitRequest habitRequest, String nickname) {
+        // Find user by nickname
+        AppUser user = appUserRepository.findByNickname(nickname)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Habit habit = new Habit();
+        habit.setName(habitRequest.getName());
+        habit.setCreatedAt(habitRequest.getCreatedAt() != null ? habitRequest.getCreatedAt() : LocalDateTime.now());
+        habit.setActive(habitRequest.isActive());
+        habit.setUser(user);
+
+        // Save habit and return
+        return habitRepository.save(habit);
+    }
+
 }

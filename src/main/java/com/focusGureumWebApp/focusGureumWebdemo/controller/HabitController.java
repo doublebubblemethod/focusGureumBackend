@@ -1,4 +1,5 @@
 package com.focusGureumWebApp.focusGureumWebdemo.controller;
+import com.focusGureumWebApp.focusGureumWebdemo.dto.HabitRequest;
 import com.focusGureumWebApp.focusGureumWebdemo.models.Habit;
 import com.focusGureumWebApp.focusGureumWebdemo.services.HabitService;
 import org.springframework.http.HttpStatus;
@@ -21,7 +22,7 @@ public class HabitController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Habit>> getHabitsByUserId(Authentication authentication) {
+    public ResponseEntity<List<Habit>> getHabitsByUserNickname(Authentication authentication) {
         String nickname = authentication.getName();
         List<Habit> habits = habitService.findByUserNickname(nickname);
         return ResponseEntity.ok(habits);
@@ -42,7 +43,8 @@ public class HabitController {
             return ResponseEntity.notFound().build();
         }
     }
-    @PatchMapping("/{habitId}")
+
+    @PatchMapping("/{habitId}/rename")
     public ResponseEntity<Habit> renameHabit(Authentication authentication, @PathVariable Integer habitId, @RequestBody Map<String, String> update) {
         try {
             String nickname = authentication.getName();
@@ -75,7 +77,7 @@ public class HabitController {
 
     }
 
-    @DeleteMapping("/{habitId}")
+    @DeleteMapping("/{habitId}/delete")
     public ResponseEntity<?> deleteHabit(Authentication authentication, @PathVariable Integer habitId) {
         try {
             String nickname = authentication.getName();
@@ -86,6 +88,17 @@ public class HabitController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         } catch (RuntimeException ex) {
             return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PatchMapping("/create")
+    public ResponseEntity<?> createHabit(Authentication authentication, @RequestBody HabitRequest habitRequest) {
+        try {
+            String nickname = authentication.getName();
+            Habit createdHabit = habitService.createHabit(habitRequest, nickname);
+            return ResponseEntity.ok(createdHabit);
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error creating habit: " + ex.getMessage());
         }
     }
 
