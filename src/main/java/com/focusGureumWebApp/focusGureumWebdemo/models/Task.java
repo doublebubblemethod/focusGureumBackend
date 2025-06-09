@@ -18,5 +18,4 @@ public class Task {
     @ManyToOne
     @JoinColumn(name = "category_FK", nullable = false)
     private Category category;
-
 }

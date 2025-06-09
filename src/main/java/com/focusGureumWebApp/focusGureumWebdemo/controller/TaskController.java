@@ -1,17 +1,18 @@
 package com.focusGureumWebApp.focusGureumWebdemo.controller;
 
 import com.focusGureumWebApp.focusGureumWebdemo.dto.TaskRequest;
-import com.focusGureumWebApp.focusGureumWebdemo.models.Task;
+import com.focusGureumWebApp.focusGureumWebdemo.dto.TaskResponse;
 import com.focusGureumWebApp.focusGureumWebdemo.services.TaskService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("api/tasks")
+@RequestMapping("/api/tasks")
 public class TaskController {
     private final TaskService taskService;
 
@@ -19,10 +20,11 @@ public class TaskController {
         this.taskService = taskService;
     }
 
-    @GetMapping
-    public ResponseEntity<?> getAllTasks() {
+    @GetMapping("/{categoryId}")
+    public ResponseEntity<?> getTasksByUserNickname(Authentication authentication, @PathVariable Integer categoryId) {
         try {
-            List<Task> tasks = taskService.getAllTasks();
+            String nickname = authentication.getName();
+            List<TaskResponse> tasks = taskService.getTasksByCategory(nickname, categoryId);
             return ResponseEntity.ok(tasks); // 200 OK with the list
         } catch (Exception e) {
             return ResponseEntity
@@ -31,18 +33,22 @@ public class TaskController {
         }
     }
     @PatchMapping("/create")
-    public ResponseEntity<String> createTaskWithPatch(@RequestBody TaskRequest request) {
+    public ResponseEntity<String> createTask(Authentication authentication, @RequestBody TaskRequest request) {
         try {
-            taskService.createTask(request.getName(), request.isStatus(), request.getCategoryId());
+            String nickname = authentication.getName();
+            taskService.createTask(nickname, request);
             return ResponseEntity.ok("Task created successfully");
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteTask(@PathVariable Integer id) {
+    @DeleteMapping("/{categoryId}/{taskId}/delete")
+    public ResponseEntity<?> deleteTask(Authentication authentication,
+                                        @PathVariable Integer categoryId,
+                                        @PathVariable Integer taskId) {
         try {
-            taskService.deleteTask(id);
+            String nickname = authentication.getName();
+            taskService.deleteTask(taskId, categoryId, nickname);
             return ResponseEntity.ok("Task deleted successfully");
         } catch (Exception e) {
             return ResponseEntity
@@ -50,10 +56,12 @@ public class TaskController {
                     .body("Error deleting task: " + e.getMessage());
         }
     }
-    @PatchMapping("/{id}/toggle")
-    public ResponseEntity<?> toggleTask(@PathVariable Integer id) {
+
+    @PatchMapping("/{categoryId}/{taskId}/toggle")
+    public ResponseEntity<?> toggleTask(Authentication authentication, @PathVariable Integer categoryId, @PathVariable Integer taskId) {
         try {
-            taskService.toggleTask(id);
+            String nickname = authentication.getName();
+            taskService.toggleTaskStatus(taskId, categoryId, nickname);
             return ResponseEntity.ok("Task status toggled successfully");
         } catch (Exception e) {
             return ResponseEntity
@@ -62,16 +70,16 @@ public class TaskController {
         }
     }
 
-    @PatchMapping("/{id}/name")
-    public ResponseEntity<?> updateTaskName(@PathVariable Integer id,
+    @PatchMapping("/{categoryId}/{taskId}/rename")
+    public ResponseEntity<?> updateTaskName(Authentication authentication, @PathVariable Integer categoryId, @PathVariable Integer taskId,
                                             @RequestBody Map<String, String> body) {
         try {
+            String nickname = authentication.getName();
             String newName = body.get("name");
             if (newName == null || newName.trim().isEmpty()) {
                 return ResponseEntity.badRequest().body("Task name cannot be empty");
             }
-
-            taskService.updateTaskName(id, newName);
+            taskService.updateTaskName(nickname, categoryId, taskId, newName);
             return ResponseEntity.ok("Task name updated successfully");
         } catch (Exception e) {
             return ResponseEntity
