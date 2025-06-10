@@ -1,5 +1,6 @@
 package com.focusGureumWebApp.focusGureumWebdemo.services;
 
+import com.focusGureumWebApp.focusGureumWebdemo.dto.DailyHabitLogCount;
 import com.focusGureumWebApp.focusGureumWebdemo.dto.HabitLogResponse;
 import com.focusGureumWebApp.focusGureumWebdemo.models.Habit;
 import com.focusGureumWebApp.focusGureumWebdemo.models.HabitLog;
@@ -9,9 +10,11 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -65,7 +68,17 @@ public class HabitLogService {
             return Collections.emptyList();
         }
     }
-
+    public Map<LocalDate, Integer> getCheckedHabitCountsByDate(String nickname, YearMonth month) {
+        try {
+            LocalDate startDate = month.atDay(1);
+            LocalDate endDate = month.atEndOfMonth();
+            List<DailyHabitLogCount> results = habitLogRepository.countCheckedHabitsWithinFrame(nickname, startDate, endDate);
+            return results.stream()
+                    .collect(Collectors.toMap(DailyHabitLogCount::getLogDate, DailyHabitLogCount::getHabitCount));
+        } catch (RuntimeException e) {
+            return Collections.emptyMap();
+        }
+    }
     // Create a new HabitLog for a user's habit on a specific date
     public HabitLog createHabitLog(String nickname, Integer habitId, LocalDate date) {
         // Check if habit belongs to user

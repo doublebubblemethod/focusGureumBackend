@@ -1,5 +1,6 @@
 package com.focusGureumWebApp.focusGureumWebdemo.services;
 import com.focusGureumWebApp.focusGureumWebdemo.dto.HabitRequest;
+import com.focusGureumWebApp.focusGureumWebdemo.dto.HabitResponse;
 import com.focusGureumWebApp.focusGureumWebdemo.models.AppUser;
 import com.focusGureumWebApp.focusGureumWebdemo.models.Habit;
 import com.focusGureumWebApp.focusGureumWebdemo.repository.AppUserRepository;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class HabitService {
@@ -33,11 +35,22 @@ public class HabitService {
 
         return habit;
     }
+    /*
+    I need a separate function that sends only active logs
+     */
+    public List<HabitResponse> findActiveHabitsByNickname(String nickname) {
+        List<Habit> activeHabits = habitRepository.findByUserNicknameAndActive(nickname, true);
 
-    public List<Habit> findByUserNickname(String nickname) {
-        return habitRepository.findByUserNickname(nickname);
+        return activeHabits.stream()
+                .map(habit -> new HabitResponse(
+                        String.valueOf(habit.getId()),
+                        habit.getName(),
+                        habit.getCreatedAt(),
+                        habit.isActive(),
+                        habit.getUser().getId()
+                ))
+                .collect(Collectors.toList());
     }
-
     public void deleteHabit(Habit habit) {
         //jpa must delete related habit schedule and logs
         //@OneToMany(mappedBy = "habit", cascade = CascadeType.REMOVE, orphanRemoval = true)

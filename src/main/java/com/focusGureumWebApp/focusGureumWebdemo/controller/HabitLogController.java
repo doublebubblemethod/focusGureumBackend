@@ -11,7 +11,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.DateTimeException;
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.List;
 import java.util.Map;
 
@@ -28,30 +30,28 @@ public class HabitLogController {
         String nickname = authentication.getName();
         List<HabitLogResponse> logs = habitLogService.findAllLogs(nickname, habitId);
         return ResponseEntity.ok(logs);
-
     }
     /*
-    optional query params startDate and endDate (format: YYYY-MM-DD).
+    get all logs counts. example:
+        curl --location 'http://localhost:8080/api/habitlogs/monthly-counts?year=2025&month=03' \
+        --header 'Authorization: ••••••' \
+        --data ''
      */
-    @PostMapping("/{habitId}/byDate")
-    public ResponseEntity<List<HabitLogResponse>> getHabitLogsByDateRange(
-            Authentication authentication,
-            @PathVariable Integer habitId,
-            @RequestBody Map<String, String> body) {
-
+    @GetMapping("/monthly-counts")
+    public ResponseEntity<Map<LocalDate, Integer>> getMonthlyHabitLogCounts(
+            @RequestParam("year") int year,
+            @RequestParam("month") int month,
+            Authentication authentication) {
         String nickname = authentication.getName();
-        LocalDate startDate = null;
-        LocalDate endDate = null;
-        if (body.containsKey("startDate")) {
-            startDate = LocalDate.parse(body.get("startDate"));  // expects "yyyy-MM-dd"
+        YearMonth yearMonth;
+        try {
+            yearMonth = YearMonth.of(year, month);
+        } catch (DateTimeException e) {
+            return ResponseEntity.badRequest().build();
         }
-        if (body.containsKey("endDate")) {
-            endDate = LocalDate.parse(body.get("endDate"));
-        }
-        List<HabitLogResponse> logs = habitLogService.findLogsByDateRange(nickname, habitId, startDate, endDate);
-        return ResponseEntity.ok(logs);
+        Map<LocalDate, Integer> counts = habitLogService.getCheckedHabitCountsByDate(nickname, yearMonth);
+        return ResponseEntity.ok(counts);
     }
-
     @PostMapping("/{habitId}/addlog")
     public ResponseEntity<?> createHabitLog(
             Authentication authentication,

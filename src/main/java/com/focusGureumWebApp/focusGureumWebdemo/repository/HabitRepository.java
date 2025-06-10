@@ -8,5 +8,6 @@ import java.util.Optional;
 
 public interface HabitRepository extends JpaRepository<Habit, Integer> {
     List<Habit> findByUserNickname(String userNickname);
+    List<Habit> findByUserNicknameAndActive(String nickname, boolean active);
 
 }

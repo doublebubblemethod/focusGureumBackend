@@ -1,5 +1,6 @@
 package com.focusGureumWebApp.focusGureumWebdemo.controller;
 import com.focusGureumWebApp.focusGureumWebdemo.dto.HabitRequest;
+import com.focusGureumWebApp.focusGureumWebdemo.dto.HabitResponse;
 import com.focusGureumWebApp.focusGureumWebdemo.models.Habit;
 import com.focusGureumWebApp.focusGureumWebdemo.services.HabitService;
 import org.springframework.http.HttpStatus;
@@ -22,9 +23,9 @@ public class HabitController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Habit>> getHabitsByUserNickname(Authentication authentication) {
+    public ResponseEntity<List<HabitResponse>> getHabitsByUserNickname(Authentication authentication) {
         String nickname = authentication.getName();
-        List<Habit> habits = habitService.findByUserNickname(nickname);
+        List<HabitResponse> habits = habitService.findActiveHabitsByNickname(nickname);
         return ResponseEntity.ok(habits);
     }
 
