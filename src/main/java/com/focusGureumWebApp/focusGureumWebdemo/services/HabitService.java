@@ -43,7 +43,7 @@ public class HabitService {
 
         return activeHabits.stream()
                 .map(habit -> new HabitResponse(
-                        String.valueOf(habit.getId()),
+                        habit.getId(),
                         habit.getName(),
                         habit.getCreatedAt(),
                         habit.isActive(),

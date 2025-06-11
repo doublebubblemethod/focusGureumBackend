@@ -1,17 +1,15 @@
 package com.focusGureumWebApp.focusGureumWebdemo.dto;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class HabitResponse {
+public class ScheduleResponse {
     private Integer id;
-    private String name;
-    private LocalDateTime createdAt;
-    private boolean active;
-    private Integer userId;
+    private String frequencyType;
+    private Integer dayStep;
+    private String daysOfWeek;
+    private Integer habitId;
 }
